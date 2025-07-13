@@ -7,7 +7,12 @@ const jwt = require('jsonwebtoken');
 const userMode = require('./Database/user');
 const bcrypt = require('bcrypt');
 const bookingModel=require('./Database/booking')
-app.use(cors());
+app.use(cors({
+  origin:process.env.FRONTEND_URL,
+  credentials:true,
+  methods:['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders:['Content-Type','Authorization']
+}));
 app.use(express.json()); // ✅ Needed to parse JSON body
 app.use(express.urlencoded({ extended: true }));
 const KEY = process.env.API_KEY || 'your_default_key'; 
