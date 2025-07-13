@@ -11,8 +11,8 @@ import { Procted } from './Component/Protected';
 const routes = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<Layout />}>
-      <Route path='signup' element={<Signup />} />
-      <Route path='login' element={<Login />} />
+      <Route path='signup' element={<Signup/>} />
+      <Route path='login' element={<Login/>} />
       <Route element={<Procted />}>
         <Route index element={<Home />} />
         <Route path='dashboard' element={<Dashboard />} />

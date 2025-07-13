@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../Layout';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
-
+import { Link } from 'react-router';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,6 +44,7 @@ const Login = () => {
       <input type="email" placeholder="Email" className="w-full mb-3 p-2 border" value={email} onChange={(e) => setEmail(e.target.value)} required />
       <input type="password" placeholder="Password" className="w-full mb-3 p-2 border" value={password} onChange={(e) => setPassword(e.target.value)} required />
       <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">Login</button>
+      <p className='w-full text-center cursor-pointer bg-green-600 text-white py-2 mt-2 rounded'><Link to="/signup">Sign up</Link></p>
     </form>
   );
 };

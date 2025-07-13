@@ -1,61 +1,133 @@
-import axios from 'axios';
 import React, { useState } from 'react';
-import { useEffect,useContext } from 'react';
 import { useAuth } from '../Layout';
+
 const BookCab = () => {
-  const {user,sendBook,message,setMessage}=useAuth();
+  const { user, sendBook, message, setMessage } = useAuth();
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [carType, setCarType] = useState('Sedan');
-  const[pick,setPick]=useState("")
-  const [drop,setDrop]=useState("")
-  const token=localStorage.getItem('token');
+  const [pick, setPick] = useState('');
+  const [drop, setDrop] = useState('');
+  const token = localStorage.getItem('token');
+
   const data = {
-    token:token,
-    date:date,
-    time:time,
-    carType:carType,
+    token,
+    date,
+    time,
+    carType,
     pick: {
-    address: pick,
-    lat: 28.6139, 
-    lng: 77.2090 
-  },
-  drop: {
-    address: drop,
-    lat: 28.5355, 
-    lng: 77.3910 
-  }
-  }
-   const handleBooking = async (e) => {
-    e.preventDefault();
-    await sendBook(data);
-    setDate(""),setDrop(""),setCarType(""),setPick(""),setTime("")
+      address: pick,
+      lat: 28.6139,
+      lng: 77.2090,
+    },
+    drop: {
+      address: drop,
+      lat: 28.5355,
+      lng: 77.3910,
+    },
   };
 
-  setTimeout(()=>{
-    setMessage(" ")
-  },2000)
-  
+  const handleBooking = async (e) => {
+    e.preventDefault();
+    await sendBook(data);
+    setDate('');
+    setDrop('');
+    setCarType('Sedan');
+    setPick('');
+    setTime('');
+  };
+
+  // Clear message after 2s
+  setTimeout(() => {
+    setMessage('');
+  }, 2000);
+
   return (
-    <form onSubmit={handleBooking} className="max-w-md mx-auto bg-white p-6 rounded shadow">
-      <h1 className='text-center'>{message}</h1>
-      <h2 className="text-xl font-semibold mb-4">Book a Cab</h2>
-      <label htmlFor="PickUp" className="block mb-2">Pickup</label>
-      <input type="text" name='PickUp' value={pick} required onChange={(e)=>setPick(e.target.value)} className="w-full mb-4 p-2 border outline-none"/>
-      <label htmlFor="Drop" className="block mb-2">Drop</label>
-      <input type="text" name='Drop' value={drop} required onChange={(e)=>setDrop(e.target.value)} className="w-full mb-4 p-2 border outline-none"/>
-      <label className="block mb-2">Date</label>
-      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full mb-4 p-2 border" required />
-      <label className="block mb-2">Time</label>
-      <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="w-full mb-4 p-2 border" required />
-      <label className="block mb-2">Car Type</label>
-      <select value={carType} onChange={(e) => setCarType(e.target.value)} className="w-full mb-4 p-2 border">
-        <option value="Sedan">Sedan</option>
-        <option value="Hatchback">Hatchback</option>
-        <option value="SUV">SUV</option>
-        <option value="Luxury">Luxury</option>
-      </select>
-      <button type="submit" className="w-full bg-green-600 text-white py-2 rounded">Book Now</button>
+    <form
+      onSubmit={handleBooking}
+      className="max-w-xl mx-auto mt-10 bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-gray-200 transition duration-300"
+    >
+      <h1 className="text-center mb-4 text-sm text-green-600 font-semibold animate-pulse">{message}</h1>
+      <h2 className="text-2xl font-bold text-blue-700 mb-6 text-center border-b pb-2">🚖 Book Your Ride</h2>
+
+      {/* Pickup */}
+      <div className="mb-4">
+        <label htmlFor="PickUp" className="block text-gray-600 font-medium mb-1">
+          Pickup Location
+        </label>
+        <input
+          type="text"
+          name="PickUp"
+          value={pick}
+          onChange={(e) => setPick(e.target.value)}
+          required
+          placeholder="Enter pickup address"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+        />
+      </div>
+
+      {/* Drop */}
+      <div className="mb-4">
+        <label htmlFor="Drop" className="block text-gray-600 font-medium mb-1">
+          Drop Location
+        </label>
+        <input
+          type="text"
+          name="Drop"
+          value={drop}
+          onChange={(e) => setDrop(e.target.value)}
+          required
+          placeholder="Enter drop address"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+        />
+      </div>
+
+      {/* Date */}
+      <div className="mb-4">
+        <label className="block text-gray-600 font-medium mb-1">Date</label>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          required
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+        />
+      </div>
+
+      {/* Time */}
+      <div className="mb-4">
+        <label className="block text-gray-600 font-medium mb-1">Time</label>
+        <input
+          type="time"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          required
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+        />
+      </div>
+
+      {/* Car Type */}
+      <div className="mb-6">
+        <label className="block text-gray-600 font-medium mb-1">Car Type</label>
+        <select
+          value={carType}
+          onChange={(e) => setCarType(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+        >
+          <option value="Sedan">🚘 Sedan</option>
+          <option value="Hatchback">🚗 Hatchback</option>
+          <option value="SUV">🚙 SUV</option>
+          <option value="Luxury">✨ Luxury</option>
+        </select>
+      </div>
+
+      {/* Submit */}
+      <button
+        type="submit"
+        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-200"
+      >
+        Confirm Booking
+      </button>
     </form>
   );
 };

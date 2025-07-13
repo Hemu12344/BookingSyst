@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-
+import { Link } from 'react-router';
 const Signup = () => {
   const navigate = useNavigate();
   const BACKEND = import.meta.env.VITE_BACKEND_URL || '/api';
@@ -131,7 +131,7 @@ const Signup = () => {
         </button>
 
         <p className="mt-3 text-sm text-center">
-          Already have an account? <a href="/login" className="text-blue-600 underline">Login</a>
+          Already have an account?  <Link to="/login" className=' p-1  rounded  hover:border text-blue-800 '>Login</Link>
         </p>
       </form>
     </div>
