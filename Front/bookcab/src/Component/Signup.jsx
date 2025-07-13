@@ -1,9 +1,10 @@
 import axios from 'axios';
-import React, { useState } from 'react';
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+
 const Signup = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const BACKEND = import.meta.env.VITE_BACKEND_URL || '/api';
 
   const [form, setForm] = useState({
     name: '',
@@ -12,57 +13,65 @@ const Signup = () => {
     role: '',
     isAccept: true
   });
+
   const [isExist, setExist] = useState(false);
   const [message, setMessage] = useState("");
- const sendData = async () => {
-  try {
-    const res = await axios.post('/api/signup', form);
-    setMessage(res.data.message);
-    setExist(false); // If signup is successful, user is new
-  } catch (err) {
-    if (err.response && err.response.data) {
-      setMessage(err.response.data.message);
-      setExist(err.response.data.isExist || false); // <-- Set isExist from error
-    } else {
-      setMessage("Something went wrong");
-      setExist(false);
-    }
-  }
-};
-
-
+  const [loading, setLoading] = useState(false); // 🔧 Start false
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // console.log(form.password.length);
+  const sendData = async () => {
+    setLoading(true); // ✅ Start loading
+    try {
+      const res = await axios.post(`${BACKEND}/signup`, form);
+      setMessage(res.data.message);
+      setExist(false);
+    } catch (err) {
+      if (err.response && err.response.data) {
+        setMessage(err.response.data.message);
+        setExist(err.response.data.isExist || false);
+      } else {
+        setMessage("Something went wrong");
+        setExist(false);
+      }
+    } finally {
+      setLoading(false); // ✅ Stop loading
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setForm({ password: "" });
-    setForm({ name: "", email: "", password: "", role: "", isAccept: false })
-    await sendData()
+    await sendData();
+    setForm({
+      name: '',
+      email: '',
+      password: '',
+      role: '',
+      isAccept: false
+    });
   };
+
   useEffect(() => {
     if (message) {
-      const timeout = setTimeout(() => {
-        setMessage("");
-      },5000);
-
+      const timeout = setTimeout(() => setMessage(""), 5000);
       return () => clearTimeout(timeout);
     }
   }, [message]);
-  console.log(isExist);
-  
-  useEffect(()=>{isExist?navigate('/login'):navigate('/signup')},[isExist])
+
+  useEffect(() => {
+    if (isExist) {
+      navigate('/login');
+    }
+  }, [isExist]);
+
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-md">
-        <h1>{
-          message ? message : ""
-        }</h1>
+        {message && <h1 className="mb-2 text-red-600 font-medium">{message}</h1>}
         <h2 className="text-2xl font-semibold mb-4">Signup</h2>
+
         <input
           type="text"
           name="name"
@@ -72,7 +81,6 @@ const Signup = () => {
           className="w-full mb-3 p-2 border rounded"
           required
         />
-
         <input
           type="email"
           name="email"
@@ -82,7 +90,6 @@ const Signup = () => {
           className="w-full mb-3 p-2 border rounded"
           required
         />
-
         <input
           type="password"
           name="password"
@@ -92,7 +99,6 @@ const Signup = () => {
           className="w-full mb-3 p-2 border rounded"
           required
         />
-
         <select
           name="role"
           value={form.role}
@@ -100,33 +106,33 @@ const Signup = () => {
           className="w-full mb-4 p-2 border rounded"
           required
         >
-          <option value="" disabled defaultChecked>Select your role</option>
+          <option value="" disabled>Select your role</option>
           <option value="Employee">Company / Employee</option>
           <option value="Vendor">Vendor</option>
         </select>
 
+        <div className='flex text-center gap-2 mb-4'>
+          <input
+            type="checkbox"
+            name="isAccept"
+            checked={form.isAccept}
+            onChange={(e) => setForm({ ...form, isAccept: e.target.checked })}
+            required
+          />
+          <label htmlFor="isAccept">I Accept all policy</label>
+        </div>
+
         <button
           type="submit"
           className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 disabled:opacity-50"
+          disabled={loading}
         >
-          {'Register'}
+          {loading ? 'Registering...' : 'Register'}
         </button>
 
         <p className="mt-3 text-sm text-center">
           Already have an account? <a href="/login" className="text-blue-600 underline">Login</a>
         </p>
-        <div className='flex text-center gap-2 mt-3'>
-          <input
-            type="checkbox"
-            name="isAccept"
-            checked={form.isAccept}
-            onChange={(e) =>
-              setForm({ ...form, isAccept: e.target.checked })
-            }
-            required
-          />
-          <label htmlFor="isAccept">I Accept all policy</label>
-        </div>
       </form>
     </div>
   );

@@ -99,7 +99,7 @@ const Dashboard = () => {
                       </span>
                     </p>
                     {
-                      booking?.status==="cancelled"?<p className='text-sm text-gray-400'>Cancle on {booking.cancle.substr(0,10)}</p>:<h1 className='p-1 w-25 text-center cursor-pointer bg-red-500 text-white hover:shadow-xl rounded-full border'  onClick={()=>handleCancelBooking(booking._id)}>Cancle</h1>
+                      booking?.status==="cancelled"?<p className='text-sm text-gray-400'>Cancle on {booking?.cancle.substr(0,10)}</p>:<h1 className='p-1 w-25 text-center cursor-pointer bg-red-500 text-white hover:shadow-xl rounded-full border'  onClick={()=>handleCancelBooking(booking?._id)}>Cancle</h1>
                     }
                   </div>
                   <p className="text-sm text-gray-400 mt-2">

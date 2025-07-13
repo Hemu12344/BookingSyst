@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../Layout';
 import { useNavigate } from 'react-router';
-import axios from 'axios'; // ✅ IMPORTANT: Added axios import
+import axios from 'axios';
 
 const Login = () => {
   const [email, setEmail] = useState('');

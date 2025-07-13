@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const token = localStorage.getItem('token');
   const login = (userData) => setUser(userData);
   const logout = () => localStorage.clear('token');
-  const BACKEND = import.meta.env.VITE_BACKEND_URL;
+  const BACKEND = import.meta.env.VITE_BACKEND_URL || "/api";
 
   const sendData = async (data) => {
     try {
