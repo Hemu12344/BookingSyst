@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({ mode }) => {
-  // ✅ Load env variables depending on the mode (development/production)
   const env = loadEnv(mode, process.cwd());
 
   return {
