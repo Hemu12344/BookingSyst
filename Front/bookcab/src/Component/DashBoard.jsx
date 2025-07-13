@@ -8,11 +8,13 @@ const Dashboard = () => {
   const token = localStorage.getItem('token');
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const BACKEND = import.meta.env.VITE_BACKEND_URL;
+
   
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await axios.get('/api/checkUser', {
+        const res = await axios.get(`${BACKEND}/checkUser`, {
           headers: { Authorization: token },
         });
         setUser(res.data.user);
@@ -23,7 +25,7 @@ const Dashboard = () => {
 
     const getBookings = async () => {
       try {
-        const res = await axios.get('/api/myBookings', {
+        const res = await axios.get(`${BACKEND}/myBookings`, {
           headers: { Authorization: token },
         });
         setBookings([res.data.booking]); // wrap it in an array
@@ -42,7 +44,7 @@ const Dashboard = () => {
 
  const handleCancelBooking = async (id) => {
   try {
-    const res = await axios.put(`/api/cancleBooking/${id}`);
+    const res = await axios.put(`${BACKEND}/cancleBooking/${id}`);
     console.log(res.data);
     setBookings(prev => prev.map(b => b._id === id ? { ...b, status: 'cancelled' } : b));
   } catch (error) {

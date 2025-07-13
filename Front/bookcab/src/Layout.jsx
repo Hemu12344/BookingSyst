@@ -8,9 +8,11 @@ export const AuthProvider = ({ children }) => {
   const token = localStorage.getItem('token');
   const login = (userData) => setUser(userData);
   const logout = () => localStorage.clear('token');
+  const BACKEND = import.meta.env.VITE_BACKEND_URL;
+
   const sendData = async (data) => {
     try {
-      const res = await axios.post('/api/login', data);
+      const res = await axios.post(`${BACKEND}/login`, data);
       if(res.data.token==undefined) return setMessage(res.data.message);
       else if(res.data.token!=undefined) return localStorage.setItem('token', res.data.token) ,setMessage(res.data.message);
     } catch (err) {
@@ -24,7 +26,7 @@ export const AuthProvider = ({ children }) => {
   
         const sendBook=(async (data)=>{
           try {
-            const res=await axios.post('/api/bookNow',data);
+            const res=await axios.post(`${BACKEND}/bookNow`,data);
             setMessage(res.data.message);
           } catch (error) {
             setMessage(error.response.data.message)
