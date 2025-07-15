@@ -1,13 +1,14 @@
 const express = require('express');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
-const app = express();
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const userModel = require('./Database/user');
 const bookingModel = require('./Database/booking');
 
+const app = express();
 const PORT = process.env.PORT || 5000;
 const KEY = process.env.API_KEY;
 
@@ -21,17 +22,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const path = require('path');
-
-// Serve static files from the React app build
-app.use(express.static(path.join(__dirname, '..', 'Front', 'bookcab', 'dist')));
-
-// Fallback route: send index.html for any route (for React Router)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'Front', 'bookcab', 'dist', 'index.html'));
-});
-
-
+// -------------------- AUTH ROUTES --------------------
 app.post('/signup', async (req, res) => {
   try {
     const { name, email, password, role, isAccept } = req.body;
@@ -53,10 +44,15 @@ app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await userModel.findOne({ email });
     if (!user) return res.status(404).json({ message: "No user found" });
+
     const match = await bcrypt.compare(password, user.pass);
     if (!match) return res.json({ message: "Incorrect password" });
 
-    const token = jwt.sign({ userName: user.name, userId: user._id, email: user.email, role: user.role }, KEY, { expiresIn: '7d' });
+    const token = jwt.sign(
+      { userName: user.name, userId: user._id, email: user.email, role: user.role },
+      KEY,
+      { expiresIn: '7d' }
+    );
     res.status(200).json({ message: "Login Successfully", token });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -84,22 +80,11 @@ app.post('/bookNow', async (req, res) => {
 
     const existing = await bookingModel.find({ employeeId: decoded.userId });
 
-    let isCancelled=false;
-    existing.map((v)=>{
-      if(v.status==="cancelled"){
-        isCancelled=true
-      }else if(v.status==="booked"){
-        isCancelled=false;
-      }
-    })
-    
-    
-    // If booking exists and is not cancelled, block new booking
-    if (existing && !isCancelled) {
+    let hasActiveBooking = existing.some(v => v.status === "booked");
+    if (hasActiveBooking) {
       return res.status(409).json({ message: "User already has a ride" });
     }
 
-    // Create new booking
     const book = new bookingModel({
       employeeId: decoded.userId,
       pickupLocation: pick,
@@ -117,7 +102,6 @@ app.post('/bookNow', async (req, res) => {
     res.status(500).json({ message: "An error occurred", error: err.message });
   }
 });
-
 
 app.get('/myBookings', async (req, res) => {
   const token = req.headers.authorization;
@@ -146,4 +130,12 @@ app.put('/cancleBooking/:id', async (req, res) => {
   }
 });
 
+// -------------------- REACT BUILD SERVING (Must Be Last) --------------------
+app.use(express.static(path.join(__dirname, '..', 'Front', 'bookcab', 'dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'Front', 'bookcab', 'dist', 'index.html'));
+});
+
+// -------------------- START SERVER --------------------
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
