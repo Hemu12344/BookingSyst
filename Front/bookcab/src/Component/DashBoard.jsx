@@ -28,14 +28,13 @@ const Dashboard = () => {
         const res = await axios.get(`${BACKEND}/myBookings`, {
           headers: { Authorization: token },
         });
-        setBookings([res.data.booking]);
+        setBookings(res.data.booking);
       } catch (error) {
         console.error('Booking fetch error:', error.response?.data || error.message);
       } finally {
         setLoading(false);
       }
     };
-
     getUser();
     getBookings();
   }, [token]);
@@ -52,7 +51,8 @@ const Dashboard = () => {
       console.log("Cancel error:", error);
     }
   };
-
+  console.log(bookings);
+  
   return (
     <div className="p-6 min-h-screen bg-gray-50">
       {/* Header */}
@@ -134,7 +134,7 @@ const Dashboard = () => {
                           : 'bg-red-100 text-red-600'
                       }`}
                     >
-                      {booking?.status.toUpperCase()}
+                      {booking?.status}
                     </span>
 
                     {booking?.status === 'cancelled' ? (

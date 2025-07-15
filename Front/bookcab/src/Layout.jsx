@@ -7,35 +7,43 @@ import { FaBars, FaTimes, FaTaxi } from 'react-icons/fa';
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState("");
+  const [loading, setLoad] = useState(false);
   const token = localStorage.getItem('token');
   const login = (userData) => setUser(userData);
   const logout = () => localStorage.clear('token');
   const BACKEND = import.meta.env.VITE_BACKEND_URL || "/api";
 
   const sendData = async (data) => {
+    setLoad(true)
     try {
       const res = await axios.post(`${BACKEND}/login`, data);
       if (res.data.token == undefined) return setMessage(res.data.message);
       else if (res.data.token != undefined) return localStorage.setItem('token', res.data.token), setMessage(res.data.message);
     } catch (err) {
+      setLoad(false)
       localStorage.clear('token')
       setMessage(err.response.data.message)
 
+    } finally {
+      setLoad(false); // Always stop loading (success or error)
     }
   }
 
   // Booking here
 
   const sendBook = (async (data) => {
+    setLoad(true);
     try {
       const res = await axios.post(`${BACKEND}/bookNow`, data);
       setMessage(res.data.message);
     } catch (error) {
       setMessage(error.response.data.message)
+    }finally{
+      setLoad(false);
     }
   })
   return (
-    <AuthContext.Provider value={{ user, login, logout, setUser, sendData, message, token, setMessage, sendBook }}>
+    <AuthContext.Provider value={{ user, login, logout, setUser, sendData, message, token, setMessage, sendBook, loading }}>
       {children}
     </AuthContext.Provider>
   );

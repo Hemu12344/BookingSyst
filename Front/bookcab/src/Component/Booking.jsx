@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { useAuth } from '../Layout';
+import { useAuth, } from '../Layout';
+import { useNavigate } from 'react-router';
+import { use } from 'react';
 
 const BookCab = () => {
-  const { user, sendBook, message, setMessage } = useAuth();
+  const { user, sendBook, message, setMessage,loading } = useAuth();
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [carType, setCarType] = useState('Sedan');
   const [pick, setPick] = useState('');
   const [drop, setDrop] = useState('');
   const token = localStorage.getItem('token');
-
+  const navigate = useNavigate()
   const data = {
     token,
     date,
@@ -30,6 +32,7 @@ const BookCab = () => {
   const handleBooking = async (e) => {
     e.preventDefault();
     await sendBook(data);
+    // navigate('/dashboard')
     setDate('');
     setDrop('');
     setCarType('Sedan');
@@ -126,7 +129,7 @@ const BookCab = () => {
         type="submit"
         className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-200"
       >
-        Confirm Booking
+        {loading?"Booking.......":"Confirm Booking"}
       </button>
     </form>
   );

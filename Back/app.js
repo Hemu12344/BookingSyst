@@ -31,7 +31,7 @@ app.post('/signup', async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
     const user = new userModel({ name, email, pass: hashed, role, isAccept });
     await user.save();
-    res.status(200).json({ message: "Registration Successful"});
+    res.status(200).json({ message: "Registration Successful" });
   } catch (err) {
     res.status(500).json({ message: "Some Error Occurred", error: err.message });
   }
@@ -45,7 +45,7 @@ app.post('/login', async (req, res) => {
     const match = await bcrypt.compare(password, user.pass);
     if (!match) return res.json({ message: "Incorrect password" });
 
-    const token = jwt.sign({ userName:user.name,userId: user._id, email: user.email, role: user.role }, KEY, { expiresIn: '7d' });
+    const token = jwt.sign({ userName: user.name, userId: user._id, email: user.email, role: user.role }, KEY, { expiresIn: '7d' });
     res.status(200).json({ message: "Login Successfully", token });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -65,34 +65,54 @@ app.get('/checkUser', (req, res) => {
 // -------------------- BOOKING ROUTES --------------------
 app.post('/bookNow', async (req, res) => {
   const { token, date, time, carType, drop, pick } = req.body;
+
   try {
     const decoded = jwt.verify(token, KEY);
     const user = await userModel.findById(decoded.userId);
     if (!user) return res.status(404).json({ message: "User not found" });
-    const existing = await bookingModel.findOne({ employeeId: decoded.userId });
-    if (existing) return res.status(409).json({ message: "User already have Ride" });
 
+    const existing = await bookingModel.find({ employeeId: decoded.userId });
+
+    let isCancelled=false;
+    existing.map((v)=>{
+      if(v.status==="cancelled"){
+        isCancelled=true
+      }else if(v.status==="booked"){
+        isCancelled=false;
+      }
+    })
+    
+    
+    // If booking exists and is not cancelled, block new booking
+    if (existing && !isCancelled) {
+      return res.status(409).json({ message: "User already has a ride" });
+    }
+
+    // Create new booking
     const book = new bookingModel({
       employeeId: decoded.userId,
       pickupLocation: pick,
       dropLocation: drop,
       date,
       time,
-      cabType: carType
+      cabType: carType,
+      status: "booked"
     });
 
     await book.save();
-    res.status(200).json({ message: "Booking successfully booked" });
+    res.status(200).json({ message: "Booking successfully created" });
+
   } catch (err) {
-    res.status(500).json({ message: "Some error occurred", error: err.message });
+    res.status(500).json({ message: "An error occurred", error: err.message });
   }
 });
+
 
 app.get('/myBookings', async (req, res) => {
   const token = req.headers.authorization;
   try {
     const decoded = jwt.verify(token, KEY);
-    const booking = await bookingModel.findOne({ employeeId: decoded.userId });
+    const booking = await bookingModel.find({ employeeId: decoded.userId });
     if (!booking) return res.status(404).json({ message: "No booking found" });
     res.status(200).json({ booking });
   } catch (err) {

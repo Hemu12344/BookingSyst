@@ -7,9 +7,10 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('company');
-  const {message,sendData,setMessage} = useAuth();
+  const {message,sendData,setMessage,loading} = useAuth();
   const navigate = useNavigate();
   const token=localStorage.getItem('token')
+  // const [loading,setLoad]=useState(false);
   const data = {
     email,
     password,
@@ -31,7 +32,6 @@ const Login = () => {
       navigate('/dashboard')
     }
   },[token])
-
   setTimeout(() => {
     setMessage("");
     clearTimeout()
@@ -43,7 +43,9 @@ const Login = () => {
       <h2 className="text-xl font-semibold mb-4">Login</h2>
       <input type="email" placeholder="Email" className="w-full mb-3 p-2 border" value={email} onChange={(e) => setEmail(e.target.value)} required />
       <input type="password" placeholder="Password" className="w-full mb-3 p-2 border" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">Login</button>
+      <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded"
+      disabled={loading}
+      >{loading?"Loading.....":"Login"}</button>
       <p className='w-full text-center cursor-pointer bg-green-600 text-white py-2 mt-2 rounded'><Link to="/signup">Sign up</Link></p>
     </form>
   );
