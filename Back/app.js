@@ -2,7 +2,6 @@ const express = require('express');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
@@ -13,6 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const KEY = process.env.API_KEY;
 
+// CORS
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true,
@@ -20,6 +20,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -80,11 +81,8 @@ app.post('/bookNow', async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const existing = await bookingModel.find({ employeeId: decoded.userId });
-
-    let hasActiveBooking = existing.some(v => v.status === "booked");
-    if (hasActiveBooking) {
-      return res.status(409).json({ message: "User already has a ride" });
-    }
+    const hasActiveBooking = existing.some(v => v.status === "booked");
+    if (hasActiveBooking) return res.status(409).json({ message: "User already has a ride" });
 
     const book = new bookingModel({
       employeeId: decoded.userId,
@@ -134,13 +132,13 @@ app.put('/cancleBooking/:id', async (req, res) => {
 // -------------------- REACT BUILD SERVING --------------------
 const reactBuildPath = path.join(__dirname, '..', 'Front', 'bookcab', 'dist');
 
-// React Router fallback (❌ WRONG)
-// React Router fallback (✅ CORRECT)
+// ✅ This line serves static files like JS, CSS
+app.use(express.static(reactBuildPath));
+
+// ✅ React Router fallback — must be after all API routes
 app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'Front', 'bookcab', 'dist', 'index.html'));
+  res.sendFile(path.join(reactBuildPath, 'index.html'));
 });
-
-
 
 // -------------------- START SERVER --------------------
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
