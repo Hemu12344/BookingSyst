@@ -13,16 +13,6 @@ export const AuthProvider = ({ children }) => {
   const logout = () => localStorage.clear('token');
   const BACKEND = import.meta.env.VITE_BACKEND_URL || "/api";
 
-const path = require('path');
-
-// Serve static files from Vite frontend build
-app.use(express.static(path.join(__dirname, '..', 'Front', 'bookcab', 'dist')));
-
-// React Router fallback
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'Front', 'bookcab', 'dist', 'index.html'));
-});
-
 
   const sendData = async (data) => {
     setLoad(true)
