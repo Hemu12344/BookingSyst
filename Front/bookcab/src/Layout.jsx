@@ -13,6 +13,15 @@ export const AuthProvider = ({ children }) => {
   const logout = () => localStorage.clear('token');
   const BACKEND = import.meta.env.VITE_BACKEND_URL || "/api";
 
+
+  const path = require('path');
+
+  app.use(express.static(path.join(__dirname, '..','Front', 'dist')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..','Front','dist', 'index.html'));
+  });
+
   const sendData = async (data) => {
     setLoad(true)
     try {
@@ -38,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       setMessage(res.data.message);
     } catch (error) {
       setMessage(error.response.data.message)
-    }finally{
+    } finally {
       setLoad(false);
     }
   })
