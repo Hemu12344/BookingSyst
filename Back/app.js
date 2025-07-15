@@ -21,6 +21,17 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const path = require('path');
+
+// Serve static files from the React app build
+app.use(express.static(path.join(__dirname, '..', 'Front', 'bookcab', 'dist')));
+
+// Fallback route: send index.html for any route (for React Router)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'Front', 'bookcab', 'dist', 'index.html'));
+});
+
+
 app.post('/signup', async (req, res) => {
   try {
     const { name, email, password, role, isAccept } = req.body;
