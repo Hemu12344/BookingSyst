@@ -134,14 +134,13 @@ app.put('/cancleBooking/:id', async (req, res) => {
 // -------------------- REACT BUILD SERVING --------------------
 const reactBuildPath = path.join(__dirname, '..', 'Front', 'bookcab', 'dist');
 
-if (fs.existsSync(reactBuildPath)) {
-  app.use(express.static(reactBuildPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(reactBuildPath, 'index.html'));
-  });
-} else {
-  console.warn('⚠️ React build folder not found. Static files not served.');
-}
+// React Router fallback (❌ WRONG)
+// React Router fallback (✅ CORRECT)
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'Front', 'bookcab', 'dist', 'index.html'));
+});
+
+
 
 // -------------------- START SERVER --------------------
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
