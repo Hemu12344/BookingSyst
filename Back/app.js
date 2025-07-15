@@ -133,6 +133,7 @@ app.put('/cancleBooking/:id', async (req, res) => {
 // -------------------- REACT BUILD SERVING (Must Be Last) --------------------
 app.use(express.static(path.join(__dirname, '..', 'Front', 'bookcab', 'dist')));
 
+// React Router fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'Front', 'bookcab', 'dist', 'index.html'));
 });
