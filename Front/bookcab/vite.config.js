@@ -1,29 +1,25 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ mode }) => {
-  // Load environment variables
-  const env = loadEnv(mode, process.cwd(), ['VITE_']);
+  // Load .env or .env.production
+  const env = loadEnv(mode, process.cwd(), 'VITE_');
   const backendUrl = env.VITE_BACKEND_URL;
 
   if (!backendUrl) {
     throw new Error(`
-      ❌ Missing VITE_BACKEND_URL in .env file
-      Add this to your .env:
-      VITE_BACKEND_URL=http://localhost:5000
+❌ Missing VITE_BACKEND_URL in .env or .env.${mode}
+✅ Add this to your .env:
+VITE_BACKEND_URL=http://localhost:5000
     `);
   }
 
   return {
-    base: '/',
-    plugins: [
-      react(),
-      tailwindcss()
-    ],
+    base: '/', // optional if deployed at root
+    plugins: [react()],
     build: {
-      outDir: '../dist', // Changed to match Express static serving
+      outDir: '../dist', // <- goes one level up (so Express can serve it)
       emptyOutDir: true,
       rollupOptions: {
         output: {
@@ -41,12 +37,7 @@ export default defineConfig(({ mode }) => {
           target: backendUrl,
           changeOrigin: true,
           secure: false,
-          rewrite: path => path.replace(/^\/api/, ''),
-          configure: (proxy) => {
-            proxy.on('error', (err) => {
-              console.error('Proxy error:', err);
-            });
-          }
+          rewrite: path => path.replace(/^\/api/, '')
         }
       }
     },
