@@ -75,7 +75,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Auth check
-app.get('/checkUser', (req, res) => {
+app.get('/api/checkUser', (req, res) => {
   const token = req.headers.authorization;
   try {
     const user = jwt.verify(token, KEY);

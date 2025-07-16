@@ -14,7 +14,7 @@ const Dashboard = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await axios.get(`${BACKEND}/checkUser`, {
+        const res = await axios.get(`${BACKEND}/api/checkUser`, {
           headers: { Authorization: token },
         });
         setUser(res.data.user);
