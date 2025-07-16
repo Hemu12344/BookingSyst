@@ -160,5 +160,22 @@ app.get('*', (req, res, next) => {
   }
   res.sendFile(path.join(reactBuildPath, 'index.html'));
 });
+
+// Debug all registered routes
+console.log("Registered backend routes:");
+app._router.stack.forEach((middleware) => {
+  if (middleware.route) {
+    console.log(`${Object.keys(middleware.route.methods).join(', ')} ${middleware.route.path}`);
+  } else if (middleware.name === 'router') {
+    middleware.handle.stack.forEach((handler) => {
+      console.log(`Router: ${Object.keys(handler.route.methods).join(', ')} ${handler.route.path}`);
+    });
+  }
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
 // -------------------- START SERVER --------------------
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
