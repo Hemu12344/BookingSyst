@@ -7,11 +7,11 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const userModel = require('./Database/user');
 const bookingModel = require('./Database/booking');
-const fs = require('fs')
 const app = express();
 const PORT = process.env.PORT || 5000;
 const KEY = process.env.API_KEY;
 
+// Configure CORS
 const allowedOrigins = [
   'http://localhost:5173',
   'https://bookmycab.onrender.com'
@@ -34,7 +34,12 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// -------------------- AUTH ROUTES --------------------
+// Serve static files from React build
+const reactBuildPath = path.join(__dirname, '..', 'Front', 'dist');
+app.use(express.static(reactBuildPath));
+
+// -------------------- API ROUTES --------------------
+// Auth Routes
 app.post('/api/signup', async (req, res) => {
   try {
     const { name, email, password, role, isAccept } = req.body;
@@ -81,7 +86,7 @@ app.get('/api/checkUser', (req, res) => {
   }
 });
 
-// -------------------- BOOKING ROUTES --------------------
+// Booking Routes
 app.post('/api/bookNow', async (req, res) => {
   const { token, date, time, carType, drop, pick } = req.body;
 
@@ -124,12 +129,12 @@ app.get('/api/myBookings', async (req, res) => {
   }
 });
 
-app.put('/api/cancleBooking/:id', async (req, res) => {
+app.put('/api/cancelBooking/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const update = await bookingModel.findByIdAndUpdate(
       id,
-      { status: 'cancelled', cancle: Date.now() },
+      { status: 'cancelled', cancel: Date.now() },
       { new: true }
     );
     if (!update) return res.status(404).json({ message: 'Booking not found' });
@@ -139,43 +144,30 @@ app.put('/api/cancleBooking/:id', async (req, res) => {
   }
 });
 
-if (app._router && app._router.stack) {
-  app._router.stack.forEach((middleware) => {
-    if (middleware.route) {
-      console.log("📍", middleware.route.path);
-    }
-  });
-}
-
-// -------------------- REACT BUILD SERVING --------------------
-const reactBuildPath = path.join(__dirname, '..', 'Front', 'bookcab', 'dist');
-
-// ✅ This line serves static files like JS, CSS
-app.use(express.static(reactBuildPath));
-
-// ✅ React Router fallback — must be after all API routes
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) {
-    return next(); // Let API routes handle it
-  }
-  res.sendFile(path.join(reactBuildPath, 'index.html'));
-});
-
-// Debug all registered routes
-console.log("Registered backend routes:");
-app._router.stack.forEach((middleware) => {
-  if (middleware.route) {
-    console.log(`${Object.keys(middleware.route.methods).join(', ')} ${middleware.route.path}`);
-  } else if (middleware.name === 'router') {
-    middleware.handle.stack.forEach((handler) => {
-      console.log(`Router: ${Object.keys(handler.route.methods).join(', ')} ${handler.route.path}`);
-    });
-  }
-});
-
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');
 });
-// -------------------- START SERVER --------------------
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+
+// React Router fallback - must be last
+app.get('*', (req, res) => {
+  res.sendFile(path.join(reactBuildPath, 'index.html'));
+});
+
+// Debug routes
+console.log("=== Registered Express Routes ===");
+app._router.stack.forEach((middleware) => {
+  if (middleware.route) {
+    const methods = Object.keys(middleware.route.methods).join(', ').toUpperCase();
+    console.log(`${methods} ${middleware.route.path}`);
+  } else if (middleware.name === 'router') {
+    middleware.handle.stack.forEach((handler) => {
+      const methods = Object.keys(handler.route.methods).join(', ').toUpperCase();
+      console.log(`${methods} ${handler.route.path}`);
+    });
+  }
+});
+
+// Start server
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

@@ -21,7 +21,10 @@ const routes = createBrowserRouter(
         <Route path='vendor' element={<VendorDashboard />} />
       </Route>
     </Route>
-  )
+  ),
+  {
+    basename: '/', 
+  }
 );
 
 export default routes;
