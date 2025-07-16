@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "clean:vite": "powershell -Command \"if (Test-Path 'node_modules\\.vite') { Remove-Item -Path 'node_modules\\.vite' -Recurse -Force }\"",
+    "dev": "npm run clean:vite && vite",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --ext js,jsx --fix",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -29,6 +30,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
+    "rimraf": "^6.0.1",
     "vite": "^7.0.0"
   }
 }
