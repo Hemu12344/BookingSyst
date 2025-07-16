@@ -19,7 +19,7 @@ VITE_BACKEND_URL=http://localhost:5000
     base: '/', // optional if deployed at root
     plugins: [react()],
     build: {
-      outDir: '../dist', // <- goes one level up (so Express can serve it)
+      outDir: 'dist',  // ✅ This keeps dist inside /Front/bookcab
       emptyOutDir: true,
       rollupOptions: {
         output: {
