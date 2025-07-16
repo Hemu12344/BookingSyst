@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const userModel = require('./Database/user');
 const bookingModel = require('./Database/booking');
-
+const fs = require('fs')
 const app = express();
 const PORT = process.env.PORT || 5000;
 const KEY = process.env.API_KEY;
