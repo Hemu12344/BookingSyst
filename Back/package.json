@@ -4,6 +4,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "build-client": "cd Front/bookcab && npm install && npm run build",
+    "heroku-postbuild": "npm run build-client",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
