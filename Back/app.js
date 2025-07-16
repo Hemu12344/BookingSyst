@@ -129,6 +129,14 @@ app.put('/cancleBooking/:id', async (req, res) => {
   }
 });
 
+if (app._router && app._router.stack) {
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      console.log("📍", middleware.route.path);
+    }
+  });
+}
+
 // -------------------- REACT BUILD SERVING --------------------
 const reactBuildPath = path.join(__dirname, '..', 'Front', 'bookcab', 'dist');
 
@@ -136,9 +144,10 @@ const reactBuildPath = path.join(__dirname, '..', 'Front', 'bookcab', 'dist');
 app.use(express.static(reactBuildPath));
 
 // ✅ React Router fallback — must be after all API routes
-app.get('/*', (req, res) => {
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(reactBuildPath, 'index.html'));
 });
+
 
 // -------------------- START SERVER --------------------
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
