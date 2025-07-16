@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import tailwindcss from '@tailwindcss/vite'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 export default defineConfig(({ mode }) => {
   // Load .env or .env.production
   const env = loadEnv(mode, process.cwd(), 'VITE_');
@@ -17,7 +18,14 @@ VITE_BACKEND_URL=http://localhost:5000
 
   return {
     base: '/', // optional if deployed at root
-    plugins: [react(),tailwindcss()],
+    plugins: [react(),tailwindcss(),viteStaticCopy({
+      targets: [
+        {
+          src: 'public/_redirects',
+          dest: '.'
+        }
+      ]
+    })],
     build: {
       outDir: 'dist',  // ✅ This keeps dist inside /Front/bookcab
       emptyOutDir: true,
