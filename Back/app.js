@@ -1,3 +1,4 @@
+// server.js or index.js
 const express = require('express');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
@@ -11,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const KEY = process.env.API_KEY;
 
-// Configure CORS
+// Allowed CORS origins
 const allowedOrigins = [
   'http://localhost:5173',
   'https://bookmycab.onrender.com'
@@ -30,13 +31,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from React build
-// -------------------- API ROUTES --------------------
-// Auth Routes
+// ========== API ROUTES ==========
+
+// Signup
 app.post('/api/signup', async (req, res) => {
   try {
     const { name, email, password, role, isAccept } = req.body;
@@ -53,6 +53,7 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
+// Login
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -73,6 +74,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Auth check
 app.get('/api/checkUser', (req, res) => {
   const token = req.headers.authorization;
   try {
@@ -83,7 +85,7 @@ app.get('/api/checkUser', (req, res) => {
   }
 });
 
-// Booking Routes
+// Book Now
 app.post('/api/bookNow', async (req, res) => {
   const { token, date, time, carType, drop, pick } = req.body;
 
@@ -114,6 +116,7 @@ app.post('/api/bookNow', async (req, res) => {
   }
 });
 
+// My Bookings
 app.get('/api/myBookings', async (req, res) => {
   const token = req.headers.authorization;
   try {
@@ -126,12 +129,14 @@ app.get('/api/myBookings', async (req, res) => {
   }
 });
 
+// ✅ Cancel Booking
 app.put('/api/cancelBooking/:id', async (req, res) => {
   const { id } = req.params;
+
   try {
     const update = await bookingModel.findByIdAndUpdate(
       id,
-      { status: 'cancelled', cancel: Date.now() },
+      { status: 'cancelled', cancle: Date.now() },
       { new: true }
     );
     if (!update) return res.status(404).json({ message: 'Booking not found' });
@@ -141,14 +146,13 @@ app.put('/api/cancelBooking/:id', async (req, res) => {
   }
 });
 
-// Error handling middleware
+// Error middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');
 });
 
-// React Router fallback - must be last
-
+// Static file serving
 const reactBuildPath = path.join(__dirname, '..', 'Front','bookcab', 'dist');
 app.use(express.static(reactBuildPath));
 app.get('*', (req, res) => {
@@ -158,7 +162,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(reactBuildPath, 'index.html'));
 });
 
-// Debug routes
+// Debug route log
 console.log("=== Registered Express Routes ===");
 app._router.stack.forEach((middleware) => {
   if (middleware.route) {
@@ -172,5 +176,5 @@ app._router.stack.forEach((middleware) => {
   }
 });
 
-// Start server
+// Server start
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

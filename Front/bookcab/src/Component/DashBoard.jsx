@@ -14,7 +14,7 @@ const Dashboard = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await axios.get(`${BACKEND}/api/checkUser`, {
+        const res = await axios.put(`${BACKEND}/api/cancelBooking/${id}`, {
           headers: { Authorization: token },
         });
         setUser(res.data.user);
@@ -41,18 +41,18 @@ const Dashboard = () => {
 
   const handleCancelBooking = async (id) => {
     try {
-      await axios.put(`${BACKEND}/api/cancleBooking/${id}`);
+      const res = await axios.put(`${BACKEND}/api/cancelBooking/${id}`);
       setBookings(prev =>
         prev.map(b =>
           b._id === id ? { ...b, status: 'cancelled', cancle: Date.now() } : b
         )
       );
+      alert(res.data.message);
     } catch (error) {
       console.log("Cancel error:", error);
+      alert("Cancel failed: " + error.response?.data?.message || error.message);
     }
   };
-  console.log(bookings);
-  
   return (
     <div className="p-6 min-h-screen bg-gray-50">
       {/* Header */}
@@ -81,7 +81,7 @@ const Dashboard = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence>
             {/* No Booking */}
-            {bookings.length === 0 || !bookings[0]? (
+            {bookings.length === 0 || !bookings[0] ? (
               <motion.div
                 className="text-center text-gray-500 col-span-full"
                 initial={{ opacity: 0 }}
@@ -90,7 +90,7 @@ const Dashboard = () => {
                 No bookings found 🚌
               </motion.div>
             ) : (
-              bookings.map((booking, index) => (       
+              bookings.map((booking, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -128,11 +128,10 @@ const Dashboard = () => {
                   {/* Booking Status */}
                   <div className="flex justify-between items-center mt-5">
                     <span
-                      className={`text-sm px-3 py-1 rounded-full font-semibold ${
-                        booking?.status === 'booked'
+                      className={`text-sm px-3 py-1 rounded-full font-semibold ${booking?.status === 'booked'
                           ? 'bg-green-100 text-green-700'
                           : 'bg-red-100 text-red-600'
-                      }`}
+                        }`}
                     >
                       {booking?.status}
                     </span>
