@@ -75,7 +75,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Auth check
-app.get('/api/checkUser', (req, res) => {
+app.get('/checkUser', (req, res) => {
   const token = req.headers.authorization;
   try {
     const user = jwt.verify(token, KEY);
@@ -153,13 +153,20 @@ app.use((err, req, res, next) => {
 });
 
 // Static file serving
-const reactBuildPath = path.join(__dirname, '..', 'Front','bookcab', 'dist');
+const reactBuildPath = path.join(__dirname, '..', 'Front', 'bookcab', 'dist');
 app.use(express.static(reactBuildPath));
+
+// Important: fallback route
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ message: 'API route not found' });
+  } else {
+    res.sendFile(path.join(reactBuildPath, 'index.html'), {
+      headers: {
+        'Content-Type': 'text/html',
+      },
+    });
   }
-  res.sendFile(path.join(reactBuildPath, 'index.html'));
 });
 
 // Debug route log

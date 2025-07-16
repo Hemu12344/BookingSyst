@@ -14,7 +14,7 @@ const Dashboard = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await axios.put(`${BACKEND}/api/cancelBooking/${id}`, {
+        const res = await axios.get(`${BACKEND}/checkUser`, {
           headers: { Authorization: token },
         });
         setUser(res.data.user);
@@ -129,8 +129,8 @@ const Dashboard = () => {
                   <div className="flex justify-between items-center mt-5">
                     <span
                       className={`text-sm px-3 py-1 rounded-full font-semibold ${booking?.status === 'booked'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-red-100 text-red-600'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-600'
                         }`}
                     >
                       {booking?.status}
