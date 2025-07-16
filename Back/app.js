@@ -35,9 +35,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from React build
-const reactBuildPath = path.join(__dirname, '..', 'Front', 'dist');
-app.use(express.static(reactBuildPath));
-
 // -------------------- API ROUTES --------------------
 // Auth Routes
 app.post('/api/signup', async (req, res) => {
@@ -151,7 +148,13 @@ app.use((err, req, res, next) => {
 });
 
 // React Router fallback - must be last
+
+const reactBuildPath = path.join(__dirname, '..', 'Front','bookcab', 'dist');
+app.use(express.static(reactBuildPath));
 app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ message: 'API route not found' });
+  }
   res.sendFile(path.join(reactBuildPath, 'index.html'));
 });
 
