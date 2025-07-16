@@ -35,7 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // -------------------- AUTH ROUTES --------------------
-app.post('/signup', async (req, res) => {
+app.post('/api/signup', async (req, res) => {
   try {
     const { name, email, password, role, isAccept } = req.body;
     const exists = await userModel.findOne({ email });
@@ -51,7 +51,7 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await userModel.findOne({ email });
@@ -71,7 +71,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/checkUser', (req, res) => {
+app.get('/api/checkUser', (req, res) => {
   const token = req.headers.authorization;
   try {
     const user = jwt.verify(token, KEY);
@@ -82,7 +82,7 @@ app.get('/checkUser', (req, res) => {
 });
 
 // -------------------- BOOKING ROUTES --------------------
-app.post('/bookNow', async (req, res) => {
+app.post('/api/bookNow', async (req, res) => {
   const { token, date, time, carType, drop, pick } = req.body;
 
   try {
@@ -112,7 +112,7 @@ app.post('/bookNow', async (req, res) => {
   }
 });
 
-app.get('/myBookings', async (req, res) => {
+app.get('/api/myBookings', async (req, res) => {
   const token = req.headers.authorization;
   try {
     const decoded = jwt.verify(token, KEY);
@@ -124,7 +124,7 @@ app.get('/myBookings', async (req, res) => {
   }
 });
 
-app.put('/cancleBooking/:id', async (req, res) => {
+app.put('/api/cancleBooking/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const update = await bookingModel.findByIdAndUpdate(
@@ -154,9 +154,11 @@ const reactBuildPath = path.join(__dirname, '..', 'Front', 'bookcab', 'dist');
 app.use(express.static(reactBuildPath));
 
 // ✅ React Router fallback — must be after all API routes
-app.get('*', (req, res) => {
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next(); // Let API routes handle it
+  }
   res.sendFile(path.join(reactBuildPath, 'index.html'));
 });
-
 // -------------------- START SERVER --------------------
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));

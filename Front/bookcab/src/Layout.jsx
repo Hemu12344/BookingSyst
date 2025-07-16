@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const sendData = async (data) => {
     setLoad(true)
     try {
-      const res = await axios.post(`${BACKEND}/login`, data);
+      const res = await axios.post(`${BACKEND}/api/login`, data);
       if (res.data.token == undefined) return setMessage(res.data.message);
       else if (res.data.token != undefined) return localStorage.setItem('token', res.data.token), setMessage(res.data.message);
     } catch (err) {
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
   const sendBook = (async (data) => {
     setLoad(true);
     try {
-      const res = await axios.post(`${BACKEND}/bookNow`, data);
+      const res = await axios.post(`${BACKEND}/api/bookNow`, data);
       setMessage(res.data.message);
     } catch (error) {
       setMessage(error.response.data.message)

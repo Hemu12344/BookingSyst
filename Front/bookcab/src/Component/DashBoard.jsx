@@ -14,7 +14,7 @@ const Dashboard = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await axios.get(`${BACKEND}/checkUser`, {
+        const res = await axios.get(`${BACKEND}/api/checkUser`, {
           headers: { Authorization: token },
         });
         setUser(res.data.user);
@@ -25,7 +25,7 @@ const Dashboard = () => {
 
     const getBookings = async () => {
       try {
-        const res = await axios.get(`${BACKEND}/myBookings`, {
+        const res = await axios.get(`${BACKEND}/api/myBookings`, {
           headers: { Authorization: token },
         });
         setBookings(res.data.booking);
@@ -41,7 +41,7 @@ const Dashboard = () => {
 
   const handleCancelBooking = async (id) => {
     try {
-      await axios.put(`${BACKEND}/cancleBooking/${id}`);
+      await axios.put(`${BACKEND}/api/cancleBooking/${id}`);
       setBookings(prev =>
         prev.map(b =>
           b._id === id ? { ...b, status: 'cancelled', cancle: Date.now() } : b
@@ -90,7 +90,7 @@ const Dashboard = () => {
                 No bookings found 🚌
               </motion.div>
             ) : (
-              bookings.map((booking, index) => (
+              bookings.map((booking, index) => (       
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}

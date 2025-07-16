@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: '/',
-    plugins: [react(),tailwindcss()], // ✅ no tailwindcss here
+    plugins: [react(),tailwindcss()], 
     build: {
       outDir: 'dist',
     },
