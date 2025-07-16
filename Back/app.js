@@ -149,7 +149,7 @@ app.use((err, req, res, next) => {
 
 // React Router fallback - must be last
 
-const reactBuildPath = path.join(__dirname, '..', 'Front', 'dist');
+const reactBuildPath = path.join(__dirname, '..', 'Front','bookcab', 'dist');
 app.use(express.static(reactBuildPath));
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api')) {
