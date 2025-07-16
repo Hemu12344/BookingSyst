@@ -7,6 +7,7 @@
     "clean:vite": "powershell -Command \"if (Test-Path 'node_modules\\.vite') { Remove-Item -Path 'node_modules\\.vite' -Recurse -Force }\"",
     "dev": "npm run clean:vite && vite",
     "build": "vite build",
+    "postbuild": "cp public/_redirects dist/",
     "lint": "eslint . --ext js,jsx --fix",
     "preview": "vite preview"
   },
