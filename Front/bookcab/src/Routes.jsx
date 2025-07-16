@@ -5,9 +5,9 @@ import Login from './Component/Login';
 import Dashboard from './Component/DashBoard';
 import BookCab from './Component/Booking';
 import AdminDashboard from './Component/AdminDashboard';
-import VendorDashboard from './Component/VendorDashboard';
+import VendorDashboard from './Component/VendorDashboadr'
 import Signup from './Component/Signup';
-import { Protected } from './Component/Protected';
+import {Protected} from './Component/Protected'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
