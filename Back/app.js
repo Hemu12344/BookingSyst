@@ -154,10 +154,9 @@ const reactBuildPath = path.join(__dirname, '..', 'Front', 'bookcab', 'dist');
 app.use(express.static(reactBuildPath));
 
 // ✅ React Router fallback — must be after all API routes
-app.get(/^\/(?!api).*/, (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(reactBuildPath, 'index.html'));
 });
-
 
 // -------------------- START SERVER --------------------
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
