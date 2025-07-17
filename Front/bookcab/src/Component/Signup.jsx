@@ -25,7 +25,7 @@ const Signup = () => {
   const sendData = async () => {
     setLoading(true); // ✅ Start loading
     try {
-      const res = await axios.post(`${BACKEND}/signup`, form);
+      const res = await axios.post(`${BACKEND}/api/signup`, form);
       setMessage(res.data.message);
       setExist(false);
     } catch (err) {
