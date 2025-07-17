@@ -10,7 +10,6 @@ const Dashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const BACKEND = import.meta.env.VITE_BACKEND_URL;
-
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -53,6 +52,18 @@ const Dashboard = () => {
       alert("Cancel failed: " + error.response?.data?.message || error.message);
     }
   };
+
+  const handleRemoveBooking = async (id) => {
+    try {
+      const res=await axios.delete(`${BACKEND}/api/DeleteBooking/${id}`, {
+        headers: { Authorization: token },
+      });
+      alert(res.data.message);
+      setBookings(prev=> prev.filter(b=>b._id!==id))
+    } catch (error) {
+      alert(error)
+    }
+  }
   return (
     <div className="p-6 min-h-screen bg-gray-50">
       {/* Header */}
@@ -81,7 +92,7 @@ const Dashboard = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence>
             {/* No Booking */}
-            {bookings.length === 0 || !bookings[0] ? (
+            {bookings?.length === 0 || !bookings[0] ? (
               <motion.div
                 className="text-center text-gray-500 col-span-full"
                 initial={{ opacity: 0 }}
@@ -99,8 +110,10 @@ const Dashboard = () => {
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   className="bg-white shadow-md rounded-2xl p-6 border hover:shadow-xl transition-transform transform hover:scale-[1.02] relative"
                 >
-                  <div className="absolute top-3 right-3 text-sm px-3 py-1 rounded-full font-medium bg-indigo-100 text-indigo-700">
-                    {booking?.cabType} Ride
+                  <div className="flex justify-between">
+                    <p className='p-2 rounded-full font-medium bg-indigo-100 text-indigo-700' >{booking?.cabType} Ride</p>
+                    <p className='p-2 rounded-full font-medium bg-red-300 text-red-700 cursor-pointer' onClick={(() => { handleRemoveBooking(booking?._id) })}>Remove</p>
+
                   </div>
 
                   <div className="space-y-2 mt-2">

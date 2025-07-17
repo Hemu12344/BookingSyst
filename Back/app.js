@@ -147,7 +147,33 @@ app.put('/api/cancelBooking/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: err });
   }
 });
+// Delete booking
 
+app.delete('/api/DeleteBooking/:Bookid', async (req, res) => {
+  const token = req.headers.authorization;
+  const bookingID = req.params.Bookid;
+
+  try {
+    if (!bookingID) return res.status(400).json({ message: "Booking ID not provided" });
+
+    const decoded = jwt.verify(token, KEY); // ✅ Fix: use 'KEY', not 'API_KEY'
+
+    const booking = await bookingModel.findOneAndDelete({
+      _id: bookingID,
+      employeeId: decoded.userId, // ensures user can only delete their own booking
+    });
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found or unauthorized" });
+    }
+
+    res.json({ message: "Booking deleted successfully", deletedBooking: booking });
+
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(401).json({ message: "Unauthorized or error occurred", error: error.message });
+  }
+});
 // Error middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -167,6 +193,8 @@ app.get('*', (req, res) => {
   res.sendFile(path.resolve(reactBuildPath, 'index.html'));
 });
 
+
+
 // Debug route log
 console.log("=== Registered Express Routes ===");
 app._router.stack.forEach((middleware) => {
@@ -180,6 +208,7 @@ app._router.stack.forEach((middleware) => {
     });
   }
 });
+
 
 // Server start
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

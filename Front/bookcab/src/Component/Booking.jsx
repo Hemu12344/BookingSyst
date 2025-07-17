@@ -32,12 +32,12 @@ const BookCab = () => {
   const handleBooking = async (e) => {
     e.preventDefault();
     await sendBook(data);
-    // navigate('/dashboard')
-    setDate('');
-    setDrop('');
-    setCarType('Sedan');
-    setPick('');
-    setTime('');
+      navigate('/dashboard')
+      setDate('');
+      setDrop('');
+      setCarType('Sedan');
+      setPick('');
+      setTime('');
   };
 
   // Clear message after 2s
