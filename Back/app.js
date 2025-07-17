@@ -16,8 +16,9 @@ const KEY = process.env.API_KEY;
 const allowedOrigins = [
   'http://localhost:5173',
   'https://bookmycab.onrender.com',
-  'bookmycab.netlify.app'
+  'https://bookmycab.netlify.app' // ✅ fixed with https
 ];
+
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -155,7 +156,7 @@ app.use((err, req, res, next) => {
 
 // Static file serving
 
-const reactBuildPath = path.resolve(__dirname, '..', 'Front', 'bookcab', 'dist');
+const reactBuildPath = path.resolve(__dirname, '..', 'Front','bookcab','dist');
 app.use(express.static(reactBuildPath));
 
 // Fallback route for React Router
