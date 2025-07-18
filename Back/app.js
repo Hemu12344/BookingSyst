@@ -15,8 +15,7 @@ const KEY = process.env.API_KEY;
 // Allowed CORS origins
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://bookmycab.onrender.com',
-  'https://bookmycab.netlify.app' // ✅ fixed with https
+  'https://bookmycab.netlify.app'
 ];
 
 

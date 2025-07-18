@@ -81,7 +81,7 @@ const Layout = () => {
         </div>
 
         {/* Hamburger Icon (Mobile) */}
-        <div className="md:hidden text-2xl text-blue-600 cursor-pointer" onClick={toggleMenu}>
+        <div className="md:hidden text-2xl text-blue-600 cursor-pointer" onClick={(()=>toggleMenu)}>
           {menuOpen ? <FaTimes /> : <FaBars />}
         </div>
 
