@@ -1,29 +1,34 @@
-import { createContext, useContext, useState } from 'react';
-import axios from 'axios'; // ✅ Needed here too
+import React, { useContext, useState, useEffect, createContext } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const login = (userData) => setUser(userData);
-  const logout = () => setUser(null);
-  const token=localStorage.getItem('token')
-  // ✅ Fixed: directly receive `data` object, not `{ data }`
   const sendData = async (data) => {
+    setLoading(true);
     try {
-      const res = await axios.post('/api/login', data);
-      console.log("✅ Backend response:", res.data);
-      // You can auto-login the user here:
-      // login({ email: data.email, role: data.role });
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/login`, data);
+      localStorage.setItem('token', res.data.token);
+      setMessage('Login successful');
     } catch (err) {
-      console.error("❌ Login error:", err.response?.data || err.message);
+      setMessage(err.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    setMessage('Logged out');
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, sendData}}>
+    <AuthContext.Provider value={{ user, setUser, message, setMessage, sendData, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

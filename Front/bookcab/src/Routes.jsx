@@ -8,7 +8,7 @@ import AdminDashboard from './Component/AdminDashboard';
 import VendorDashboard from './Component/VendorDashboadr'
 import Signup from './Component/Signup';
 import {Protected} from './Component/Protected'
-
+import DriverRegistration from './Component/Driver/Dregister';
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
@@ -16,10 +16,9 @@ const router = createBrowserRouter(
       <Route path="login" element={<Login />} />
       <Route element={<Protected />}>
         <Route index element={<Home />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path={`dashboard`} element={<Dashboard />} />
         <Route path="book" element={<BookCab />} />
-        <Route path="admin" element={<AdminDashboard />} />
-        <Route path="vendor" element={<VendorDashboard />} />
+        <Route path='RegisterDriver' element={<DriverRegistration/>}/>
       </Route>
     </Route>
   ),

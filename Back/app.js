@@ -65,7 +65,7 @@ app.post('/api/login', async (req, res) => {
     if (!match) return res.json({ message: "Incorrect password" });
 
     const token = jwt.sign(
-      { userName: user.name, userId: user._id, email: user.email, role: user.role },
+      { userName: user.name, userId: user._id, email: user.email, role: user.role,newUser:user.newUser },
       KEY,
       { expiresIn: '7d' }
     );

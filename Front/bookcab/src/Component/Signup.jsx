@@ -107,8 +107,8 @@ const Signup = () => {
           required
         >
           <option value="" disabled>Select your role</option>
-          <option value="Employee">Company / Employee</option>
-          <option value="Vendor">Vendor</option>
+          <option value="User">Customer</option>
+          <option value="Driver">Driver</option>
         </select>
 
         <div className='flex text-center gap-2 mb-4'>

@@ -65,8 +65,12 @@ const Layout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
+    if(token){
+      logout();
+      navigate('/login')
+    }else{
+      navigate('/login');
+    }
   };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -81,7 +85,7 @@ const Layout = () => {
         </div>
 
         {/* Hamburger Icon (Mobile) */}
-        <div className="md:hidden text-2xl text-blue-600 cursor-pointer" onClick={(()=>toggleMenu)}>
+        <div className="md:hidden text-2xl text-blue-600 cursor-pointer" onClick={toggleMenu}>
           {menuOpen ? <FaTimes /> : <FaBars />}
         </div>
 
@@ -91,9 +95,13 @@ const Layout = () => {
             <>
               <Link to="/" className="hover:text-blue-600 transition">Home</Link>
               <Link to="/dashboard" className="hover:text-blue-600 transition">Dashboard</Link>
-              {user?.role === 'admin' && <Link to="/admin" className="hover:text-blue-600 transition">Admin</Link>}
-              {user?.role === 'vendor' && <Link to="/vendor" className="hover:text-blue-600 transition">Vendor</Link>}
-              {user?.role !== 'vendor' && <Link to="/book" className="hover:text-blue-600 transition">Book</Link>}
+              {user?.role==="User"?<Link
+                  to="/book"
+                  onClick={toggleMenu}
+                  className="py-2 px-2 hover:bg-blue-50 rounded transition"
+                >
+                Book Cab
+                </Link>:<></>}
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded shadow transition"
@@ -115,7 +123,6 @@ const Layout = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden flex flex-col bg-white/90 backdrop-blur-sm shadow-md px-6 py-4 text-gray-800 font-medium divide-y divide-gray-200 rounded-b-xl">
@@ -144,7 +151,7 @@ const Layout = () => {
                   🛠️ Admin
                 </Link>
               )}
-              {user?.role === 'vendor' && (
+              {user?.role === 'Driver' && (
                 <Link
                   to="/vendor"
                   onClick={toggleMenu}
@@ -153,7 +160,7 @@ const Layout = () => {
                   🚚 Vendor
                 </Link>
               )}
-              {user?.role !== 'vendor' && (
+              {user?.role === 'User' && (
                 <Link
                   to="/book"
                   onClick={toggleMenu}

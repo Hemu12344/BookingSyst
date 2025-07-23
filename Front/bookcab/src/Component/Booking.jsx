@@ -12,6 +12,8 @@ const BookCab = () => {
   const [drop, setDrop] = useState('');
   const token = localStorage.getItem('token');
   const navigate = useNavigate()
+  const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit',hour12: true });
+  const timeData=["Select Time", "5:00 AM","10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM",`Current Time :${nowTime}`]
   const data = {
     token,
     date,
@@ -93,6 +95,7 @@ const BookCab = () => {
           value={date}
           onChange={(e) => setDate(e.target.value)}
           required
+          min={new Date().toISOString().split('T')[0]}  
           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
         />
       </div>
@@ -100,13 +103,15 @@ const BookCab = () => {
       {/* Time */}
       <div className="mb-4">
         <label className="block text-gray-600 font-medium mb-1">Time</label>
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          required
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-        />
+        <select name="time" className='w-full' onChange={((e)=>setTime(e.target.value))}>
+          {timeData.map((d)=>{
+            if(nowTime){
+             return  <option  value={d} key={d} defaultValue={d==="Select"}>{d}</option>
+            }else{
+             return  <option  value={d} key={d} defaultValue={d==="Select"}>{d}</option>
+            }
+          })}
+        </select>
       </div>
 
       {/* Car Type */}

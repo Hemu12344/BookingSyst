@@ -2,9 +2,9 @@ const driverSchema = new mongoose.Schema({
   name: String,
   phone: String,
   licenseNumber: String,
-  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vendor' },
-  assignedVehicle: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' },
-  isAvailable: { type: Boolean, default: true },
+  vehicleNumber:String,
+  vehicleType:String,
+  isAvailable: { type:String, eval:["Busy","Availble"],default:"Availble" },
   currentLocation: {
     lat: Number,
     lng: Number

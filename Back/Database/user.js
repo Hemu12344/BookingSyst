@@ -10,7 +10,8 @@ const schema=mongoose.Schema({
     email:{type:String,require:true},
     pass:{type:String,require:true},
     role:{type:String,require:true},
-    isAccept:{type:String,require:true,default:false}
+    isAccept:{type:String,require:true,default:false},
+    newUser:{type:Boolean,default:true,require:true}
 })
 
 module.exports= mongoose.model('user',schema)
