@@ -8,6 +8,7 @@ import AdminDashboard from './Component/AdminDashboard';
 import VendorDashboard from './Component/VendorDashboadr'
 import Signup from './Component/Signup';
 import {Protected} from './Component/Protected'
+import { Vendor } from './Component/Driver/Vendor';
 import DriverRegistration from './Component/Driver/Dregister';
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
         <Route path={`dashboard`} element={<Dashboard />} />
         <Route path="book" element={<BookCab />} />
         <Route path='RegisterDriver' element={<DriverRegistration/>}/>
+        <Route path='Vendor' element={<Vendor/>}/>
       </Route>
     </Route>
   ),

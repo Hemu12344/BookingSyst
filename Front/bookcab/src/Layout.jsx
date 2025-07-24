@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
   const logout = () => localStorage.clear('token');
   const BACKEND = import.meta.env.VITE_BACKEND_URL || "/api";
 
-
   const sendData = async (data) => {
     setLoad(true)
     try {
@@ -43,8 +42,44 @@ export const AuthProvider = ({ children }) => {
       setLoad(false);
     }
   })
+
+
+  const sendDriverData=async (data)=>{
+    setLoad(true);
+
+    try {
+      const res = await axios.post(`${BACKEND}/api/driverRegister`,data,{
+         headers: {
+        Authorization:token,
+      },
+      });
+      setMessage(res.data.message)
+    } catch (error) {
+      setMessage(err.response?.data?.message || 'Register Failed');
+    }finally{
+      setLoad(false);
+    }
+  }
+
+  const driverDetail=async(token)=>{
+    try {
+      const res = await axios(`${BACKEND}/api/driverDetail`,{
+        headers:{
+          Authorization:token
+        }
+      })
+      setUser(res.data.user);
+    } catch (error) {
+      setMessage(error)
+    }
+  }
+  // const logout = () => {
+  //   localStorage.removeItem('token');
+  //   setUser(null);
+  //   setMessage('Logged out');
+  // };
   return (
-    <AuthContext.Provider value={{ user, login, logout, setUser, sendData, message, token, setMessage, sendBook, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, setUser, sendData, message, token, setMessage, sendBook, loading,sendDriverData ,driverDetail}}>
       {children}
     </AuthContext.Provider>
   );
@@ -57,6 +92,7 @@ export const useAuth = () => useContext(AuthContext);
 // -------------------------------
 import React from 'react';
 import { Outlet, Link } from 'react-router';
+
 
 const Layout = () => {
   const { user, logout } = useAuth();

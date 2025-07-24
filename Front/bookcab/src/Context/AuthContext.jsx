@@ -21,6 +21,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const sendDriverData=async (data)=>{
+    setLoading(true);
+
+    try {
+      const res = await axios.post('/api/driverRegister',data);
+      setMessage(res.data.message)
+    } catch (error) {
+      setMessage(err.response?.data?.message || 'Register Failed');
+    }finally{
+      setLoading(false);
+    }
+  }
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
@@ -28,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, message, setMessage, sendData, loading, logout }}>
+    <AuthContext.Provider value={{ user, setUser, message, setMessage, sendData, loading, logout,sendDriverData }}>
       {children}
     </AuthContext.Provider>
   );

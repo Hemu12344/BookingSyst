@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../Layout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaMapMarkerAlt, FaClock, FaCarSide, FaTimesCircle } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaClock, FaCarSide, FaTimesCircle,FaIdCard,FaPhone,FaCheckCircle, FaUser, FaCar, FaLocationArrow } from 'react-icons/fa';
 
 const Dashboard = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser,setMessage} = useAuth();
+  const [driver,setDriver]=useState(null);
   const token = localStorage.getItem('token');
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const BACKEND = import.meta.env.VITE_BACKEND_URL;
+  
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -34,10 +36,27 @@ const Dashboard = () => {
         setLoading(false);
       }
     };
+     const driverDetail=async()=>{
+        try {
+          const res = await axios(`${BACKEND}/api/driverDetail`,{
+            headers:{
+              Authorization:token
+            }
+          })
+          setDriver(res.data.user);
+        } catch (error) {
+          setMessage(error)
+        }
+      }
     getUser();
-    getBookings();
+    if(user?.role === "User"){
+      getBookings();
+    }
+    driverDetail();
   }, [token]);
 
+
+  
   const handleCancelBooking = async (id) => {
     try {
       const res = await axios.put(`${BACKEND}/api/cancelBooking/${id}`);
@@ -66,19 +85,60 @@ const Dashboard = () => {
   }
   if (user?.role === "Driver") {
     return (
-      <div className="text-center mb-10">
+      <motion.div
+        className="bg-gradient-to-r from-indigo-100 via-white to-purple-100 rounded-2xl p-8 shadow-xl text-center mb-10"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="flex items-center justify-center mb-4">
+          <motion.div
+            className="text-indigo-600 bg-white rounded-full p-4 shadow-lg"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
+          >
+            <FaCarSide size={40} />
+          </motion.div>
+        </div>
+
         <motion.h2
-          className="text-3xl font-bold text-indigo-700"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="text-4xl font-extrabold text-indigo-700"
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
         >
-          {user?.role} Dashboard
+          Driver Dashboard
         </motion.h2>
-        <p className="text-gray-600 mt-2">
-          Welcome back, <span className="font-medium text-gray-800">{user?.userName}</span> 👋
+
+        <p className="mt-3 text-lg text-gray-700">
+          Welcome back, <span className="font-semibold text-indigo-900">{driver?.name || "None"}</span> 👋
         </p>
-      </div>
-    )
+
+        {/* Driver Info Card */}
+        <motion.div
+          className="mt-8 bg-white rounded-xl p-6 shadow-lg text-left max-w-md mx-auto border border-indigo-100"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center gap-2">
+            <FaIdCard /> Driver Information
+          </h3>
+
+          <div className="space-y-2 text-gray-700">
+            <p><FaUser className="inline text-indigo-500 mr-2" /><strong>Name:</strong> {driver?.name || "None"}</p>
+            <p><FaPhone className="inline text-indigo-500 mr-2" /> <strong>Phone:</strong> {driver?.phone || "N/A"}</p>
+            <p><FaLocationArrow className="inline text-indigo-500 mr-2" /> <strong>Working Location:</strong> {driver?.location || "N/A"}</p>
+            <p><FaIdCard className="inline text-indigo-500 mr-2" /> <strong>License Number:</strong> {driver?.licenseNumber || "N/A"}</p>
+            <p><FaCarSide className="inline text-indigo-500 mr-2" /> <strong>Vehicle No:</strong> {driver?.vehicleNumber || "N/A"}</p>
+            <p><FaCar className="inline text-indigo-500 mr-2" /><strong>Vehicle Type:</strong> {driver?.vehicleType || "N/A"}</p>
+            {/* <p><FaMapMarkerAlt className="inline text-indigo-500 mr-2" /> <strong>Location:</strong> {driver?.lat}, {driver?.lng}</p> */}
+            <p><FaCheckCircle className="inline text-green-600 mr-2" /> <strong>Status:</strong> {driver?.isAvailable}</p>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
   }
   if (user?.role === "User") {
     return (

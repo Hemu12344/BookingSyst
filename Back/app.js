@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const userModel = require('./Database/user');
 const bookingModel = require('./Database/booking');
+const driverModel=require('./Database/driver')
 const app = express();
 const PORT = process.env.PORT || 5000;
 const KEY = process.env.API_KEY;
@@ -173,6 +174,83 @@ app.delete('/api/DeleteBooking/:Bookid', async (req, res) => {
     res.status(401).json({ message: "Unauthorized or error occurred", error: error.message });
   }
 });
+
+
+//Driver Registration
+// ✅ Correct: Driver Registration Route
+app.post('/api/driverRegister', async (req, res) => {
+  try {
+    const {
+      name,
+      phone,
+      location,
+      licenseNumber,
+      vehicleNumber,
+      vehicleType,
+      isAvailable,
+      lat,
+      lng,
+    } = req.body;
+
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).json({ message: "Token is required" });
+    }
+
+    const decoded = jwt.verify(token, KEY);
+
+    const check = await userModel.findOne({ email: decoded.email });
+    if (!check) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await userModel.findOneAndUpdate(
+      { _id: check._id },
+      { newUser: false },
+      { new: true }
+    );
+
+    const newData = new driverModel({
+      userId:check._id,
+      name,
+      phone,
+      location,
+      licenseNumber,
+      vehicleNumber,
+      vehicleType,
+      isAvailable,
+      currentLocation: {
+        lat,
+        lng
+      }
+    });
+
+    await newData.save();
+    return res.status(200).json({ message: "Driver registered successfully" });
+
+  } catch (error) {
+    console.error("Driver registration error:", error.message);
+    return res.status(500).json({ message: "Registration failed", error: error.message });
+  }
+});
+
+
+app.get('/api/driverDetail',async(req,res)=>{
+  const token = req.headers.authorization
+  
+  const decoded = jwt.verify(token,KEY);
+  // console.log(decoded);
+  try {
+    if(!token){
+      return res.json({message:"No token found"})
+    }
+    const user=await driverModel.findOne({userId:decoded.userId});
+    
+    res.status(200).json({ user});
+  } catch (error) {
+    res.status(404).json({message:error});
+  }
+})
 // Error middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
