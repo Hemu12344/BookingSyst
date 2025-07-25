@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const token = localStorage.getItem('token');
   const login = (userData) => setUser(userData);
   const logout = () => localStorage.clear('token');
+  const [driver, setDriver] = useState(null);
   const BACKEND = import.meta.env.VITE_BACKEND_URL || "/api";
 
   const sendData = async (data) => {
@@ -61,25 +62,13 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const driverDetail=async(token)=>{
-    try {
-      const res = await axios(`${BACKEND}/api/driverDetail`,{
-        headers:{
-          Authorization:token
-        }
-      })
-      setUser(res.data.user);
-    } catch (error) {
-      setMessage(error)
-    }
-  }
   // const logout = () => {
   //   localStorage.removeItem('token');
   //   setUser(null);
   //   setMessage('Logged out');
   // };
   return (
-    <AuthContext.Provider value={{ user, login, logout, setUser, sendData, message, token, setMessage, sendBook, loading,sendDriverData ,driverDetail}}>
+    <AuthContext.Provider value={{ user, login, logout, setUser, sendData, message, token, setMessage, sendBook, loading,sendDriverData,driver,setDriver}}>
       {children}
     </AuthContext.Provider>
   );

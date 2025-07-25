@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const driver = require('./driver');
 const bookingSchema =mongoose.Schema({
   employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   pickupLocation: {
@@ -24,11 +25,7 @@ const bookingSchema =mongoose.Schema({
   assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver' },
   assignedVehicle: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' },
   cost: Number,
-  tracking: [{
-    lat: Number,
-    lng: Number,
-    timestamp: Date
-  }]
+  tracking:[{type:mongoose.Schema.Types.ObjectId,ref:'driver'},]
 }, { timestamps: true });
 
 module.exports =mongoose.model('booking',bookingSchema)

@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../Layout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaMapMarkerAlt, FaClock, FaCarSide, FaTimesCircle,FaIdCard,FaPhone,FaCheckCircle, FaUser, FaCar, FaLocationArrow } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaClock, FaCarSide, FaTimesCircle, FaIdCard, FaPhone, FaCheckCircle, FaUser, FaCar, FaLocationArrow } from 'react-icons/fa';
 
 const Dashboard = () => {
-  const { user, setUser,setMessage} = useAuth();
-  const [driver,setDriver]=useState(null);
+  const { user, setUser, setMessage,driver, setDriver } = useAuth();
   const token = localStorage.getItem('token');
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const BACKEND = import.meta.env.VITE_BACKEND_URL;
-  
+  const [driverDetail,setdriverDetail]=useState();
+  console.log(driverDetail);
+
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -30,33 +31,32 @@ const Dashboard = () => {
           headers: { Authorization: token },
         });
         setBookings(res.data.booking);
+        setdriverDetail([res.data.driverDetail])
       } catch (error) {
         console.error('Booking fetch error:', error.response?.data || error.message);
       } finally {
         setLoading(false);
       }
     };
-     const driverDetail=async()=>{
-        try {
-          const res = await axios(`${BACKEND}/api/driverDetail`,{
-            headers:{
-              Authorization:token
-            }
-          })
-          setDriver(res.data.user);
-        } catch (error) {
-          setMessage(error)
-        }
+    const driverDetail = async () => {
+      try {
+        const res = await axios(`${BACKEND}/api/driverDetail`, {
+          headers: {
+            Authorization: token
+          }
+        })
+        setDriver(res.data.user);
+      } catch (error) {
+        setMessage(error)
       }
-    getUser();
-    if(user?.role === "User"){
-      getBookings();
     }
+    getUser();
+    getBookings();
     driverDetail();
   }, [token]);
 
 
-  
+
   const handleCancelBooking = async (id) => {
     try {
       const res = await axios.put(`${BACKEND}/api/cancelBooking/${id}`);
@@ -185,8 +185,7 @@ const Dashboard = () => {
                     <p className='text-sm text-gray-700 pb-2 pl-2'>Booking Id : {booking?._id}</p>
                     <div className="flex justify-between">
                       <p className='p-2 rounded-full font-medium bg-indigo-100 text-indigo-700' >{booking?.cabType} Ride</p>
-                      <p className='p-2 rounded-full font-medium bg-red-300 text-red-700 cursor-pointer' onClick={(() => { handleRemoveBooking(booking?._id) })}>Remove</p>
-
+                      {booking?.status === 'booked'?"":<p className='p-2 rounded-full font-medium bg-red-300 text-red-700 cursor-pointer' onClick={(() => { handleRemoveBooking(booking?._id) })}>{"Remove"}</p>}
                     </div>
 
                     <div className="space-y-2 mt-2">
@@ -235,6 +234,35 @@ const Dashboard = () => {
                         </button>
                       )}
                     </div>
+                    {booking?.tracking?.length > 0 && (
+                      <div className="mt-5 border-t pt-4">
+                        <p className="text-sm font-semibold text-indigo-600 mb-2">Track Driver:</p>
+                        <div className="grid gap-3">
+                          {driverDetail.map((driver, i) => (
+                            <div
+                              key={i}
+                              className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 shadow-sm"
+                            >
+                              <p className="text-gray-800 font-medium">
+                                🚘 Name: <span className="font-normal">{driver?.name || "N/A"}</span>
+                              </p>
+                              <p className="text-gray-600">
+                                📞 Phone: <span className="font-medium">{driver?.phone || "N/A"}</span>
+                              </p>
+                              <p className="text-gray-600">
+                                🧭 Location: <span className="font-medium">{driver?.location || "N/A"}</span>
+                              </p>
+                              <p className="text-gray-600">
+                                🚗 Vehicle No: <span className="font-medium">{driver?.vehicleNumber || "N/A"}</span>
+                              </p>
+                              <p className="text-gray-600">
+                                🔒 License: <span className="font-medium">{driver?.licenseNumber || "N/A"}</span>
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 ))
               )}

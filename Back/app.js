@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const userModel = require('./Database/user');
 const bookingModel = require('./Database/booking');
-const driverModel=require('./Database/driver')
+const driverModel = require('./Database/driver')
 const app = express();
 const PORT = process.env.PORT || 5000;
 const KEY = process.env.API_KEY;
@@ -66,7 +66,7 @@ app.post('/api/login', async (req, res) => {
     if (!match) return res.json({ message: "Incorrect password" });
 
     const token = jwt.sign(
-      { userName: user.name, userId: user._id, email: user.email, role: user.role,newUser:user.newUser },
+      { userName: user.name, userId: user._id, email: user.email, role: user.role, newUser: user.newUser },
       KEY,
       { expiresIn: '7d' }
     );
@@ -100,6 +100,7 @@ app.post('/api/bookNow', async (req, res) => {
     const hasActiveBooking = existing.some(v => v.status === "booked");
     if (hasActiveBooking) return res.status(409).json({ message: "User already has a ride" });
 
+    // Step 1: Save booking first (without tracking for now)
     const book = new bookingModel({
       employeeId: decoded.userId,
       pickupLocation: pick,
@@ -111,21 +112,51 @@ app.post('/api/bookNow', async (req, res) => {
     });
 
     await book.save();
+
+    // Step 2: Now match driver based on pickup location
+    const drivers = await driverModel.find();
+    const matchedDrivers = drivers.filter(
+      (d) => d.location.toLowerCase() === pick.address.toLowerCase()
+    );
+
+    const matchedDriverIds = matchedDrivers.map(d => d._id);
+
+    // Step 3: Update matched drivers’ bookings
+    for (const driverId of matchedDriverIds) {
+      await driverModel.findByIdAndUpdate(
+        driverId,
+        { $push: { bookings: book._id } },
+        { new: true }
+      );
+    }
+
+    // Step 4: Update booking with matched driver IDs in tracking
+    await bookingModel.findByIdAndUpdate(
+      book._id,
+      { tracking: matchedDriverIds }
+    );
+
     res.status(200).json({ message: "Booking successfully created" });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "An error occurred", error: err.message });
   }
 });
+
 
 // My Bookings
 app.get('/api/myBookings', async (req, res) => {
   const token = req.headers.authorization;
   try {
     const decoded = jwt.verify(token, KEY);
-    const booking = await bookingModel.find({ employeeId: decoded.userId });
+    const booking = await bookingModel.find({ employeeId: decoded.userId }); 
     if (!booking) return res.status(404).json({ message: "No booking found" });
-    res.status(200).json({ booking });
+    const driverId = booking[0].tracking[0];
+    const driverDetail = await driverModel.findOne({_id:driverId});
+    // console.log(driverDetail);
+    
+    res.status(200).json({ booking,driverDetail});
   } catch (err) {
     res.status(401).json({ message: "Invalid token" });
   }
@@ -211,7 +242,7 @@ app.post('/api/driverRegister', async (req, res) => {
     );
 
     const newData = new driverModel({
-      userId:check._id,
+      userId: check._id,
       name,
       phone,
       location,
@@ -235,22 +266,36 @@ app.post('/api/driverRegister', async (req, res) => {
 });
 
 
-app.get('/api/driverDetail',async(req,res)=>{
-  const token = req.headers.authorization
-  
-  const decoded = jwt.verify(token,KEY);
-  // console.log(decoded);
+app.get('/api/driverDetail', async (req, res) => {
+  const token = req.headers.authorization;
+
   try {
-    if(!token){
-      return res.json({message:"No token found"})
+    if (!token) {
+      return res.status(401).json({ message: "No token found" });
     }
-    const user=await driverModel.findOne({userId:decoded.userId});
+
+    const decoded = jwt.verify(token, KEY);
+
+    // Get driver
+    const driver = await driverModel.findOne({ userId: decoded.userId });
+
+    // Step 1: Get all booking data
+    const bookingIDs = driver.bookings; // array
+    const bookingData = await bookingModel.find({ _id: { $in: bookingIDs } });
+
+    // Step 2: Extract all booker (employee) IDs from bookings
+    const bookerIds = bookingData.map(b => b.employeeId);
+
+    // Step 3: Get all booker details
+    const bookers = await userModel.find({ _id: { $in: bookerIds } });
     
-    res.status(200).json({ user});
+    res.status(200).json({ driver, bookingData, bookers });
   } catch (error) {
-    res.status(404).json({message:error});
+    console.error("Driver detail fetch error:", error);
+    res.status(500).json({ message: "Server error", error });
   }
-})
+});
+
 // Error middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -259,7 +304,7 @@ app.use((err, req, res, next) => {
 
 // Static file serving
 
-const reactBuildPath = path.resolve(__dirname, '..', 'Front','bookcab','dist');
+const reactBuildPath = path.resolve(__dirname, '..', 'Front', 'bookcab', 'dist');
 app.use(express.static(reactBuildPath));
 
 // Fallback route for React Router

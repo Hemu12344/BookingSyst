@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth, } from '../Layout';
 import { useNavigate } from 'react-router';
 import { use } from 'react';
@@ -14,6 +14,7 @@ const BookCab = () => {
   const navigate = useNavigate()
   const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit',hour12: true });
   const timeData=["Select Time", "5:00 AM","10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM",`Current Time :${nowTime}`]
+
   const data = {
     token,
     date,
@@ -31,6 +32,7 @@ const BookCab = () => {
     },
   };
 
+
   const handleBooking = async (e) => {
     e.preventDefault();
     await sendBook(data);
@@ -41,7 +43,6 @@ const BookCab = () => {
       setPick('');
       setTime('');
   };
-
   // Clear message after 2s
   setTimeout(() => {
     setMessage('');

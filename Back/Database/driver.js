@@ -12,7 +12,7 @@ const driverSchema = new mongoose.Schema({
     lat: Number,
     lng: Number
   },
-  bookings:[]
+  bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'booking' }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Driver', driverSchema);
