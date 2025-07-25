@@ -19,6 +19,9 @@ const DriverRegistration = () => {
     token:token
   });
 
+  setTimeout(()=>{
+    setMessage(" ")
+  },5000)
   const navigate=useNavigate();
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

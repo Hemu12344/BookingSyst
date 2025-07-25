@@ -126,7 +126,17 @@ const Layout = () => {
                   className="py-2 px-2 hover:bg-blue-50 rounded transition"
                 >
                 Book Cab
-                </Link>:<></>}
+                </Link>:<></>
+              }
+               {user?.role === 'Driver' && (
+                <Link
+                  to="/vendor"
+                  onClick={toggleMenu}
+                  className="py-2 px-2 hover:bg-blue-50 rounded transition"
+                >
+                  🚚 Vendor
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded shadow transition"

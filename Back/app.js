@@ -154,7 +154,7 @@ app.get('/api/myBookings', async (req, res) => {
     if (!booking) return res.status(404).json({ message: "No booking found" });
     const driverId = booking[0].tracking[0];
     const driverDetail = await driverModel.findOne({_id:driverId});
-    // console.log(driverDetail);
+    console.log(driverDetail);
     
     res.status(200).json({ booking,driverDetail});
   } catch (err) {
@@ -279,6 +279,11 @@ app.get('/api/driverDetail', async (req, res) => {
     // Get driver
     const driver = await driverModel.findOne({ userId: decoded.userId });
 
+    // ✅ Null check
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+
     // Step 1: Get all booking data
     const bookingIDs = driver.bookings; // array
     const bookingData = await bookingModel.find({ _id: { $in: bookingIDs } });
@@ -288,13 +293,14 @@ app.get('/api/driverDetail', async (req, res) => {
 
     // Step 3: Get all booker details
     const bookers = await userModel.find({ _id: { $in: bookerIds } });
-    
+
     res.status(200).json({ driver, bookingData, bookers });
   } catch (error) {
     console.error("Driver detail fetch error:", error);
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
 
 // Error middleware
 app.use((err, req, res, next) => {

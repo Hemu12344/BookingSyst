@@ -11,19 +11,22 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const BACKEND = import.meta.env.VITE_BACKEND_URL;
   const [driverDetail,setdriverDetail]=useState();
-  console.log(driverDetail);
-
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const res = await axios.get(`${BACKEND}/api/checkUser`, {
-          headers: { Authorization: token },
-        });
-        setUser(res.data.user);
-      } catch (error) {
-        console.error('User fetch error:', error.response?.data || error.message);
-      }
-    };
+  const getUser = async () => {
+    try {
+      const res = await axios.get(`${BACKEND}/api/checkUser`, {
+        headers: { Authorization: token },
+      });
+      setUser(res.data.user);
+    } catch (error) {
+      console.error('User fetch error:', error.response?.data || error.message);
+    }
+  };
+
+  getUser();
+}, [token]);
+  useEffect(() => {
+    if (!user?.role) return;
 
     const getBookings = async () => {
       try {
@@ -45,17 +48,19 @@ const Dashboard = () => {
             Authorization: token
           }
         })
-        setDriver(res.data.user);
-      } catch (error) {
-        setMessage(error)
+        setDriver(res.data.driver);
+        // console.log(res.data.driver);
+        
+      } catch (err) {
+        setMessage(err.response?.data?.message || err.message || "Something went wrong")
       }
     }
-    getUser();
-    getBookings();
-    driverDetail();
-  }, [token]);
+    if (user?.role === "User") getBookings();
+  if (user?.role === "Driver") driverDetail();
+  }, [user,token]);
 
 
+  
 
   const handleCancelBooking = async (id) => {
     try {

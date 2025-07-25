@@ -53,7 +53,7 @@ const BookCab = () => {
       onSubmit={handleBooking}
       className="max-w-xl mx-auto mt-10 bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-gray-200 transition duration-300"
     >
-      <h1 className="text-center mb-4 text-sm text-green-600 font-semibold animate-pulse">{message}</h1>
+      <h1 className="text-center mb-4 text-sm text-green-600 font-semibold animate-pulse">{message?.message}</h1>
       <h2 className="text-2xl font-bold text-blue-700 mb-6 text-center border-b pb-2">🚖 Book Your Ride</h2>
 
       {/* Pickup */}

@@ -23,7 +23,7 @@ export const Vendor = () => {
                 setBooker(res.data.bookers)
                 
             } catch (error) {
-                setMessage(error);
+                setMessage(err.response?.data?.message || err.message || "Something went wrong");
             }
         }
         driverDetail();
